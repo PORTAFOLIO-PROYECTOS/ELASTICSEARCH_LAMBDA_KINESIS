@@ -1,0 +1,23 @@
+{
+  "name": "elasticsearch_lambda_kinesis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "aws-sdk": "^2.429.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PORTAFOLIO-PROYECTOS/ELASTICSEARCH_LAMBDA_KINESIS.git"
+  },
+  "author": "HugoRoca",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PORTAFOLIO-PROYECTOS/ELASTICSEARCH_LAMBDA_KINESIS/issues"
+  },
+  "homepage": "https://github.com/PORTAFOLIO-PROYECTOS/ELASTICSEARCH_LAMBDA_KINESIS#readme"
+}
