@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "aws-sdk": "^2.429.0",
+    "elasticsearch": "^15.4.1",
     "kinesis-readable": "^1.2.0"
   },
   "devDependencies": {},
