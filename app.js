@@ -35,7 +35,7 @@ class Base {
     try {
 
         // see below for options
-        var readable = require('kinesis-readable')(kinesis);
+        /*var readable = require('kinesis-readable')(kinesis);
 
         readable
             // 'data' events will trigger for a set of records in the stream
@@ -57,7 +57,7 @@ class Base {
             })
             .on('end', function () {
                 console.log('all done!');
-            });
+            });*/
 
         /*setTimeout(function () {
             readable.close();
