@@ -13,16 +13,45 @@ const kinesis = new AWS.Kinesis({
 });
 
 class Base {
-    async getRecords(iterator){
+
+    async describeStream() {
+        return new Promise((resolve, reject) => {
+            let paramsStream = {
+                StreamName: config.kinesis.streamName
+            }
+
+            kinesis.describeStream(paramsStream, (err, data) => {
+                if (err) reject(err);
+                resolve(data);
+            })
+        });
+    }
+
+    async getShardIterator(shardId) {
+        return new Promise((resolve, reject) => {
+            let params = {
+                ShardId: shardId,
+                StreamName: config.kinesis.streamName,
+                ShardIteratorType: "AT_TIMESTAMP",
+                Timestamp: new Date("2019-04-01 00:00:00")
+            }
+
+            kinesis.getShardIterator(params, (err, data) => {
+                if (err) reject(err);
+                resolve(data);
+            })
+        });
+    }
+
+    async getRecords(iterator) {
         return new Promise((resolve, reject) => {
             let paramsRecords = {
                 ShardIterator: iterator
             }
 
-            kinesis.getRecords(paramsRecords, (err, records) => {
+            kinesis.getRecords(paramsRecords, (err, data) => {
                 if (err) reject(err);
-                console.log("dataRecords", records);
-                resolve(records);
+                resolve(data);
             })
         });
     }
@@ -30,108 +59,33 @@ class Base {
 
 (async () => {
     try {
+        let clsBase = new Base();
 
-        // see below for options
-        /*var readable = require('kinesis-readable')(kinesis);
+        let describeStream = await clsBase.describeStream();
+        //console.log(describeStream);
+        let shardId = describeStream.StreamDescription.Shards[0].ShardId;
+        //console.log("shardId", shardId);
+        let getShardIterator = await clsBase.getShardIterator(shardId);
+        //console.log(getShardIterator);
+        let iterator = getShardIterator.ShardIterator;
+        //
+        let bucle = true;
 
-        readable
-            // 'data' events will trigger for a set of records in the stream
-            .on('data', function (records) {
-                //console.log(records);
-                for (const key in records) {
-                    const element = records[key];
+        while (bucle) {
+            console.log("************************");
+            let getRecords = await clsBase.getRecords(iterator);
+            console.log("TAMAÑO", getRecords.Records.length);
+            if (getRecords.Records) {
+                for (const key in getRecords.Records) {
+                    const element = getRecords.Records[key];
                     let payload = new Buffer(element.Data, 'base64').toString('ascii');
-                    console.log('records.Data:', payload);
+                    //console.log('------- records.Data:', payload);
                 }
-            })
-            // each time a records are passed downstream, the 'checkpoint' event will provide
-            // the last sequence number that has been read
-            .on('checkpoint', function (sequenceNumber) {
-                console.log(sequenceNumber);
-            })
-            .on('error', function (err) {
-                console.error(err);
-            })
-            .on('end', function () {
-                console.log('all done!');
-            });*/
-
-        kinesis.describeStream({ StreamName: config.kinesis.streamName }, (err, streamData) => {
-            if (err) return console.log("error", err.stack);
-            let shardId = streamData.StreamDescription.Shards[0].ShardId;
-
-            if (!shardId) return console.error("Shard does not exist");
-
-            let params = {
-                ShardId: shardId,
-                StreamName: config.kinesis.streamName,
-                ShardIteratorType: "AT_TIMESTAMP",
-                Timestamp: new Date("2019-04-01 10:10 am")
             }
-            kinesis.getShardIterator(params, (err, shardIteratorData) => {
-                if (err) return console.log("err", err.stack);
-                console.log(shardIteratorData);
 
-                let paramsRecords = {
-                    ShardIterator: shardIteratorData.ShardIterator
-                }
-
-                kinesis.getRecords(paramsRecords, (err, records) => {
-                    if (err) return console.log("err", err.stack);
-                    //console.log("dataRecords", records);
-
-                    for (const key in records) {
-                        const element = records[key];
-                        console.log("elemnto", element.length);
-                        if (element) {
-                            element.forEach(e => {
-                                let payload = new Buffer(e.Data, 'base64').toString('ascii');
-                                console.log("Data", payload);
-
-                            });
-                        }
-                        //console.log('records.Data:', element.Data);
-                    }
-
-                })
-
-            });
-        });
-
-        /*kinesis.describeStream({
-            StreamName: config.kinesis.streamName
-        }, (err, streamData) => {
-            if (err) console.log(err, err.stack);
-            else {
-                console.log("**** streamData", streamData);
-                console.log("streamData.StreamDescription.Shards", JSON.stringify(streamData.StreamDescription.Shards));
-
-                streamData.StreamDescription.Shards.forEach(shard => {
-
-                    kinesis.getShardIterator({
-                        ShardId: shard.ShardId,
-                        ShardIteratorType: "TRIM_HORIZON",
-                        StreamName: config.kinesis.streamName
-                    }, (err, shardIteratorData) => {
-                        if (err) console.log(err, err.stack);
-                        else {
-                            console.log("**** shardIteratorData", shardIteratorData);
-
-                            kinesis.getRecords({
-                                ShardIterator: shardIteratorData.ShardIterator,
-                                Limit: 1000
-                            }, (err, recordsData) => {
-                                if (err) console.log(err, err.stack);
-                                else {
-                                    console.log("**** recordsData", recordsData);
-                                }
-                            });
-                        }
-                    });
-
-                });
-            }
-        });*/
+            iterator = getRecords.NextShardIterator;
+            if (!iterator) bucle = false;
+        }
     } catch (error) {
         console.error(error);
     }
