@@ -13,8 +13,6 @@ const kinesis = new AWS.Kinesis({
 });
 
 
-
-
 (async () => {
     try {
 
@@ -52,16 +50,40 @@ const kinesis = new AWS.Kinesis({
             let params = {
                 ShardId: shardId,
                 StreamName: config.kinesis.streamName,
-                ShardIteratorType: "TRIM_HORIZON"
+                ShardIteratorType: "AT_SEQUENCE_NUMBER",
+                StartingSequenceNumber: "49593293221786655550237029411129333670633979209767190530"
             }
-
             kinesis.getShardIterator(params, (err, shardIteratorData) => {
                 if (err) return console.log("err", err.stack);
-                
+                console.log(shardIteratorData);
+
+                let paramsRecords = {
+                    ShardIterator: shardIteratorData.ShardIterator
+                }
+
+                kinesis.getRecords(paramsRecords, (err, records) => {
+                    if (err) return console.log("err", err.stack);
+                    //console.log("dataRecords", records);
+
+                    for (const key in records) {
+                        const element = records[key];
+                        console.log("elemnto", element.length);
+                        if (element) {
+                            element.forEach(e => {
+                                let payload = new Buffer(e.Data, 'base64').toString('ascii');
+                                console.log("Data", payload);
+
+                            });
+                        }
+                        //console.log('records.Data:', element.Data);
+                    }
+
+                })
+
             });
         });
 
-        kinesis.describeStream({
+        /*kinesis.describeStream({
             StreamName: config.kinesis.streamName
         }, (err, streamData) => {
             if (err) console.log(err, err.stack);
@@ -94,7 +116,7 @@ const kinesis = new AWS.Kinesis({
 
                 });
             }
-        });
+        });*/
     } catch (error) {
         console.error(error);
     }
