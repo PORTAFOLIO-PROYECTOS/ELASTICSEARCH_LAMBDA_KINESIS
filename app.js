@@ -1,33 +1,24 @@
 "use strict";
-const kinesis = require("./app/utils/kinesis");
-const elasticSearch = require("./app/utils/elasticSearch");
+const _kinesis = require("./app/utils/Kinesis");
+const _estrategia = require("./app/estrategia/EstrategiaService");
 
 (async () => {
     try {
-        let clsKinesis = new kinesis();
+        let kinesis = new _kinesis();
+        let estrategia = new _estrategia();
 
-        let describeStream = await clsKinesis.describeStream();
-        //console.log(describeStream);
+        let describeStream = await kinesis.describeStream();
         let shardId = describeStream.StreamDescription.Shards[0].ShardId;
-        //console.log("shardId", shardId);
-        let getShardIterator = await clsKinesis.getShardIterator(shardId);
-        //console.log(getShardIterator);
+        let getShardIterator = await kinesis.getShardIterator(shardId);
         let iterator = getShardIterator.ShardIterator;
-        //
         let bucle = true;
 
         while (bucle) {
-            console.log("************************");
-            let getRecords = await clsKinesis.getRecords(iterator);
-            console.log("TAMAÑO", getRecords.Records.length);
+            let getRecords = await kinesis.getRecords(iterator);
             if (getRecords.Records) {
-                for (const key in getRecords.Records) {
-                    const element = getRecords.Records[key];
-                    let payload = new Buffer(element.Data, 'base64').toString('ascii');
-                    console.log('------- records.Data:', payload);
-                }
+                let response = await estrategia.ejecutar(getRecords.Records);
+                console.log("response", response);
             }
-
             iterator = getRecords.NextShardIterator;
             if (!iterator) bucle = false;
         }
