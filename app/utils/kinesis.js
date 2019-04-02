@@ -1,4 +1,4 @@
-const config = require("../config");
+const config = require("../../config");
 const AWS = require("aws-sdk");
 const kinesis = new AWS.Kinesis({
     //apiVersion: "2013-12-02",

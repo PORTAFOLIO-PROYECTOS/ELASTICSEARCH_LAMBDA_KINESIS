@@ -1,6 +1,6 @@
 "use strict";
-const kinesis = require("./utils/kinesis");
-const elasticSearch = require("./utils/elasticSearch");
+const kinesis = require("./app/utils/kinesis");
+const elasticSearch = require("./app/utils/elasticSearch");
 
 (async () => {
     try {
@@ -24,7 +24,7 @@ const elasticSearch = require("./utils/elasticSearch");
                 for (const key in getRecords.Records) {
                     const element = getRecords.Records[key];
                     let payload = new Buffer(element.Data, 'base64').toString('ascii');
-                    //console.log('------- records.Data:', payload);
+                    console.log('------- records.Data:', payload);
                 }
             }
 

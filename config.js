@@ -7,7 +7,8 @@ const config = {
         streamName: "somosbelcorp-sbbuscador-producto-qa"
     },
     elasticSearch: {
-        url: "https://vpc-es-sbsearch-qa-6lqloaf2kfljixcaekbyqxu2aa.us-east-1.es.amazonaws.com"
+        url: "https://vpc-es-sbsearch-qa-6lqloaf2kfljixcaekbyqxu2aa.us-east-1.es.amazonaws.com",
+        index: "producto_v2"
     }
 }
 
