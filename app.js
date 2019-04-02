@@ -12,12 +12,12 @@ const _estrategia = require("./app/estrategia/EstrategiaService");
         let getShardIterator = await kinesis.getShardIterator(shardId);
         let iterator = getShardIterator.ShardIterator;
         let bucle = true;
-
+        console.log("Corriendo...");
         while (bucle) {
             let getRecords = await kinesis.getRecords(iterator);
             if (getRecords.Records) {
                 let response = await estrategia.ejecutar(getRecords.Records);
-                console.log("response", response);
+                
             }
             iterator = getRecords.NextShardIterator;
             if (!iterator) bucle = false;

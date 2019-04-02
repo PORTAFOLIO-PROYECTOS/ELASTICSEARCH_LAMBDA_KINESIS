@@ -15,15 +15,12 @@ module.exports = class ElasticSearch {
         return `${prefijo}_${pais}_${campania}`;
     }
 
-    async update(campania, query, script) {
+    async update(campania, body) {
         let index = this.getIndexName(campania);
         let params = {
             index,
             type: "_doc",
-            body: {
-                query,
-                script
-            }
+            body
         }
         console.log("query", params);
 

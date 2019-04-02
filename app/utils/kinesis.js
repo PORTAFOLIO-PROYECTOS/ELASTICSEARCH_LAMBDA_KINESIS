@@ -31,8 +31,8 @@ module.exports = class Kineses {
             let params = {
                 ShardId: shardId,
                 StreamName: config.kinesis.streamName,
-                ShardIteratorType: "AT_TIMESTAMP",
-                Timestamp: new Date("2019-04-02 14:50:00")
+                ShardIteratorType: "LATEST"
+                //Timestamp: new Date("2019-04-02 14:50:00")
             }
 
             kinesis.getShardIterator(params, (err, data) => {
