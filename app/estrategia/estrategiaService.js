@@ -6,9 +6,9 @@ const Elastic = require("../utils/elasticSearch");
 module.exports = class EstrategiaService {
     async ejecutar(record) {
         let ElasticSearch = new Elastic();
+        let retorno = [];
 
         for (const key in record) {
-            debugger;
             const element = record[key];
             let dataBuffer = new Buffer(element.Data, "base64").toString("utf8");
             console.log("dataBuffer", dataBuffer);
@@ -26,8 +26,11 @@ module.exports = class EstrategiaService {
                 }
             };
 
-            return await ElasticSearch.update(campania, body);
+            let response = await ElasticSearch.update(campania, body);
+            retorno.push(response);
         }
+        
+        return retorno;
     }
 
     getScript(data) {

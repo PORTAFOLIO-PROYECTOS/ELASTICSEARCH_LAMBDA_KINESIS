@@ -16,7 +16,7 @@ module.exports = class ElasticSearch {
     }
 
     async update(campania, body) {
-        let index = this.getIndexName(campania);
+        let index = this.getIndexName(campania).toLowerCase();
         console.log("Indice", index);
         let params = {
             index,

@@ -16,7 +16,7 @@ const _estrategia = require("./app/estrategia/EstrategiaService");
         while (bucle) {
             let getRecords = await kinesis.getRecords(iterator);
             if (getRecords.Records.length > 0) {
-                console.log("Records", getRecords);
+                console.log("Records", getRecords.Records);
                 let response = await estrategia.ejecutar(getRecords.Records);
                 console.log("Salida de ES", response);
             }
