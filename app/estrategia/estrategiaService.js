@@ -9,13 +9,12 @@ module.exports = class EstrategiaService {
 
         for (const key in record) {
             const element = record[key];
-            let jsonData = new Buffer(element.Data, "base64").toString("ascii");
-            console.log("jsonDataParse", JSON.parse(jsonData));
-            let campania = jsonData.codigoCampania;
-            let inline = this.getScript(jsonData);
+            let dataBuffer = JSON.parse(new Buffer(element.Data, "base64").toString("ascii"));
+            let campania = dataBuffer.codigoCampania;
+            let inline = this.getScript(dataBuffer);
             let body = {
                 query: {
-                    term: { "productoResumenId": jsonData._id }
+                    term: { "productoResumenId": dataBuffer._id }
                 },
                 script: {
                     inline: inline.join(";")
@@ -23,7 +22,7 @@ module.exports = class EstrategiaService {
             };
 
             let response = await ElasticSearch.update(campania, body);
-            console.log("Respuesta", response);
+            console.log("Respuesta de elastic", response);
         }
     }
 
@@ -37,22 +36,24 @@ module.exports = class EstrategiaService {
             `ctx._source.valorizado = ${data.valorizado}`,//double
             `ctx._source.precio = ${data.precio}`,//double
             `ctx._source.ganancia = ${data.ganancia}`,//double
-            `ctx._source.zonasAgotadas = ${data.zonasAgotadas}`,//array
+            `ctx._source.zonasAgotadas = ${JSON.stringify(data.zonasAgotadas)}`,//array
             `ctx._source.codigoEstrategia = ${data.codigoEstrategia}`,//int
             `ctx._source.codigoTipoEstrategia = '${data.codigoTipoEstrategia}'`,//string
             `ctx._source.marcaId = ${data.marcaId}`,//int
             `ctx._source.limiteVenta = ${data.limiteVenta}`,//int
-            `ctx._source.activo = '${data.activo.toString().toLowerCase()}'`,//string
+            `ctx._source.activo = '${data.activo}'`,//string
             `ctx._source.tipoEstrategiaId = '${data.tipoEstrategiaId}'`,//string
             `ctx._source.estrategiaId = '${data.estrategiaId}'`,//string
             //`ctx._source.fechaModificacion = '${data.fechaModificacion}'`,
             //`ctx._source.codigoCatalogo = '${data.codigoCatalogo}'`,
-            `ctx._source.marcas = ${data.marcas}`,//array
-            `ctx._source.categorias = ${data.categorias}`,//array
-            `ctx._source.grupoArticulos = ${data.grupoArticulos}`,//array
-            `ctx._source.lineas = ${data.lineas}`,//array
-            `ctx._source.codigoProductos = '${data.codigoProductos}'`,
-            `ctx._source.esSubCampania = ${data.esSubCampania}`
+            `ctx._source.marcas = ${JSON.stringify(data.marcas)}`,//array
+            `ctx._source.categorias = ${JSON.stringify(data.categorias)}`,//array
+            `ctx._source.grupoArticulos = ${JSON.stringify(data.grupoArticulos)}`,//array
+            `ctx._source.lineas = ${JSON.stringify(data.lineas)}`,//array
+            `ctx._source.codigoProductos = ${JSON.stringify(data.codigoProductos)}`,
+            `ctx._source.esSubCampania = ${data.esSubCampania}`,
+            `ctx._source.seccion1 = '${data.seccion}'`,
+            `ctx._source.orden = ${data.orden}`
             //falta orden, seccion
         ]
     }

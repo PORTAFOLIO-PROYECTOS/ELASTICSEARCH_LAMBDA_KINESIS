@@ -8,7 +8,7 @@ const config = {
     },
     elasticSearch: {
         url: "https://vpc-es-sbsearch-qa-6lqloaf2kfljixcaekbyqxu2aa.us-east-1.es.amazonaws.com",
-        index: "producto_v2"
+        index: "producto_v3"
     }
 }
 

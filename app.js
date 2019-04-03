@@ -15,9 +15,10 @@ const _estrategia = require("./app/estrategia/EstrategiaService");
         console.log("Corriendo...");
         while (bucle) {
             let getRecords = await kinesis.getRecords(iterator);
-            if (getRecords.Records) {
+            if (getRecords.Records.length > 0) {
+                console.log("Records", getRecords);
                 let response = await estrategia.ejecutar(getRecords.Records);
-                
+                console.log("Salida de ES", response);
             }
             iterator = getRecords.NextShardIterator;
             if (!iterator) bucle = false;

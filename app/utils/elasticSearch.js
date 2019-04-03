@@ -20,16 +20,18 @@ module.exports = class ElasticSearch {
         let params = {
             index,
             type: "_doc",
-            body
+            body,
+            waitForCompletion: false,
+            conflicts: "proceed"
         }
-        console.log("query", params);
 
-        let client = this.setInstance();
-        /*return new Promise((resolve, reject) => {
+        let client = this.setNewInstance();
+        
+        return new Promise((resolve, reject) => {
             client.updateByQuery(params, (err, data) => {
                 if (err) reject(err);
                 resolve(data);
             });
-        });*/
+        });
     }
 }
