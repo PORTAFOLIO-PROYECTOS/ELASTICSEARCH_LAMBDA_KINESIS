@@ -5,31 +5,35 @@ const Elastic = require("../utils/elasticSearch");
 
 module.exports = class EstrategiaService {
     async ejecutar(record) {
-        let ElasticSearch = new Elastic();
         let retorno = [];
+        try {
+            let ElasticSearch = new Elastic();
 
-        for (const key in record) {
-            const element = record[key];
-            let dataBuffer = new Buffer(element.Data, "base64").toString("utf8");
-            console.log("dataBuffer", dataBuffer);
-            let data = JSON.parse(dataBuffer);
+            for (const key in record) {
+                const element = record[key];
+                let dataBuffer = new Buffer(element.Data, "base64").toString("utf8");
+                console.log("dataBuffer", dataBuffer);
+                let data = JSON.parse(dataBuffer);
 
-            //console.log("dataBufferJSON", data);
-            let campania = data.codigoCampania;
-            let inline = this.getScript(data);
-            let body = {
-                query: {
-                    term: { "productoResumenId": data._id }
-                },
-                script: {
-                    inline: inline.join(";")
-                }
-            };
+                //console.log("dataBufferJSON", data);
+                let campania = data.codigoCampania;
+                let inline = this.getScript(data);
+                let body = {
+                    query: {
+                        term: { "productoResumenId": data._id }
+                    },
+                    script: {
+                        inline: inline.join(";")
+                    }
+                };
 
-            let response = await ElasticSearch.update(campania, body);
-            retorno.push(response);
+                let response = await ElasticSearch.update(campania, body);
+                retorno.push(response);
+            }
+        } catch (error) {
+            console.error("EstrategiaService", error);
         }
-        
+
         return retorno;
     }
 
