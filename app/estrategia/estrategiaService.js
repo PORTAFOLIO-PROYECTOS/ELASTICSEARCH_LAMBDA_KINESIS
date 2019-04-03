@@ -8,21 +8,25 @@ module.exports = class EstrategiaService {
         let ElasticSearch = new Elastic();
 
         for (const key in record) {
+            debugger;
             const element = record[key];
-            let dataBuffer = JSON.parse(new Buffer(element.Data, "base64").toString("ascii"));
-            let campania = dataBuffer.codigoCampania;
-            let inline = this.getScript(dataBuffer);
+            let dataBuffer = new Buffer(element.Data, "base64").toString("utf8");
+            console.log("dataBuffer", dataBuffer);
+            let data = JSON.parse(dataBuffer);
+
+            //console.log("dataBufferJSON", data);
+            let campania = data.codigoCampania;
+            let inline = this.getScript(data);
             let body = {
                 query: {
-                    term: { "productoResumenId": dataBuffer._id }
+                    term: { "productoResumenId": data._id }
                 },
                 script: {
                     inline: inline.join(";")
                 }
             };
 
-            let response = await ElasticSearch.update(campania, body);
-            console.log("Respuesta de elastic", response);
+            return await ElasticSearch.update(campania, body);
         }
     }
 
